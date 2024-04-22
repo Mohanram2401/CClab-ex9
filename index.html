@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Location Transfer</title>
+</head>
+<body>
+    <h1>Live Location Transfer</h1>
+    
+    <!-- Button to fetch location -->
+    <button onclick="getLocation()">Get My Location</button>
+    
+    <p id="location"></p>
+    
+    <script>
+        // Function to get current location
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+        
+        // Function to display location data
+        function showPosition(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            document.getElementById("location").innerHTML = "Latitude: " + latitude + "<br>Longitude: " + longitude;
+            
+            // Call function to send data to ThingSpeak
+            sendDataToThingSpeak(latitude, longitude);
+        }
+        
+        // Function to send data to ThingSpeak
+        function sendDataToThingSpeak(latitude, longitude) {
+            var apiKey = "4M0U4RDMFWZ52912"; // Replace this with your ThingSpeak API key
+            var url = "https://api.thingspeak.com/update?api_key=" + apiKey + "&field1=" + latitude + "&field2=" + longitude;
+            
+            // Send data using fetch API
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Data sent to ThingSpeak:', data);
+                })
+                .catch(error => {
+                    console.error('Error sending data to ThingSpeak:', error);
+                });
+        }
+    </script>
+</body>
+</html>
